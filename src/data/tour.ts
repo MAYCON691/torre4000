@@ -5,11 +5,15 @@
    El panel de abajo te da las coordenadas listas para copiar aqui.
    ========================================================================== */
 
+/** Hacia donde apunta la flecha del hotspot (por defecto "up") */
+export type Arrow = "up" | "down" | "left" | "right";
+
 /** Hotspot dentro de una escena 360: angulos en GRADOS */
 export type Hotspot = {
   target: string;
   label: string;
   kicker?: string;
+  arrow?: Arrow;
   /** 0 = al frente, 90 = a la derecha, -90 = a la izquierda, 180 = atras */
   yaw: number;
   /** + arriba, - abajo */
@@ -21,6 +25,7 @@ export type FlatHotspot = {
   target: string;
   label: string;
   kicker?: string;
+  arrow?: Arrow;
   x: number;
   y: number;
   /** Lado hacia donde sale la etiqueta */
@@ -44,6 +49,12 @@ export type PanoScene = Base & {
 };
 
 export type TourScene = FlatScene | PanoScene;
+
+/**
+ * Si cambias las fotos 360 y quieres que los visitantes vuelvan a ver la pantalla
+ * de carga con las imagenes nuevas, cambia el numero (v1 -> v2).
+ */
+export const tourCacheKey = "t4-tour-cargado-v1";
 
 export const tourIntro = {
   eyebrow: "Realidad virtual",
@@ -102,7 +113,7 @@ export const tourScenes: TourScene[] = [
     start: { yaw: 0, pitch: 0 },
     hotspots: [
       { target: "mirador-vista", label: "Vista panorámica", kicker: "Siguiente", yaw: 70, pitch: -8 },
-      { target: "restaurante", label: "Bajar al restaurante", kicker: "Nivel medio", yaw: -110, pitch: -18 },
+      { target: "restaurante", label: "Bajar al restaurante", kicker: "Nivel medio", arrow: "down", yaw: -110, pitch: -18 },
     ],
   },
   {
@@ -114,7 +125,7 @@ export const tourScenes: TourScene[] = [
     src: "/360-2.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "mirador", label: "Volver al mirador", yaw: 180, pitch: -10 },
+      { target: "mirador", label: "Volver al mirador", arrow: "down", yaw: 180, pitch: -10 },
       { target: "exterior", label: "Ver la torre por fuera", kicker: "Exterior", yaw: -70, pitch: -6 },
     ],
   },
@@ -131,7 +142,7 @@ export const tourScenes: TourScene[] = [
     hotspots: [
       { target: "restaurante-salon", label: "Salón principal", kicker: "Siguiente", yaw: 60, pitch: -5 },
       { target: "mirador", label: "Subir al mirador", kicker: "Nivel superior", yaw: -120, pitch: 12 },
-      { target: "lobby", label: "Bajar al lobby", kicker: "Planta baja", yaw: 150, pitch: -20 },
+      { target: "lobby", label: "Bajar al lobby", kicker: "Planta baja", arrow: "down", yaw: 150, pitch: -20 },
     ],
   },
   {
@@ -143,7 +154,7 @@ export const tourScenes: TourScene[] = [
     src: "/360-4.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "restaurante", label: "Volver a la entrada", yaw: 180, pitch: -8 },
+      { target: "restaurante", label: "Volver a la entrada", arrow: "down", yaw: 180, pitch: -8 },
     ],
   },
 

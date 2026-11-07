@@ -1,3 +1,4 @@
+import RegisterSW from "@/components/RegisterSW";
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Roboto, Roboto_Condensed } from "next/font/google";
 import { site } from "@/data/site";
@@ -72,6 +73,7 @@ export default function RootLayout({
           <Footer />
           <FloatingSocials />
         </MotionProvider>
+      <RegisterSW />
       </body>
     </html>
   );

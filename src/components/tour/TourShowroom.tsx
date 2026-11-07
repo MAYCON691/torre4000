@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   firstSceneId,
   sceneById,
+  tourCacheKey,
   tourIntro,
   tourScenes,
   type FlatScene as FlatSceneData,
@@ -15,9 +16,14 @@ import FlatScene from "@/components/tour/FlatScene";
 import PanoViewer, { type PanoApi } from "@/components/tour/PanoViewer";
 import TourHud from "@/components/tour/TourHud";
 import TourPoster from "@/components/tour/TourPoster";
+import { preloadAll } from "@/components/tour/preload";
 import "./tour.css";
 
 const FLAT = tourScenes.find((scene): scene is FlatSceneData => scene.kind === "flat");
+const FIRST_PANO = tourScenes.find((scene): scene is PanoScene => scene.kind === "pano") ?? null;
+
+/** Todas las imagenes del tour: se descargan mientras se ve "Cargando realidad virtual" */
+const TOUR_FILES = [tourIntro.poster, ...tourScenes.map((scene) => scene.src)];
 
 /**
  * Showroom virtual: portada con "Cargando realidad virtual", exterior con
@@ -30,6 +36,7 @@ export default function TourShowroom() {
   const nativeFs = useRef(false);
 
   const [ready, setReady] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [started, setStarted] = useState(false);
   const [sceneId, setSceneId] = useState(firstSceneId);
   const [panoId, setPanoId] = useState<string | null>(null);
@@ -41,27 +48,51 @@ export default function TourShowroom() {
   const [pick, setPick] = useState<string | null>(null);
 
   const scene = sceneById[sceneId];
-  const panoScene = panoId ? (sceneById[panoId] as PanoScene) : null;
+  // El visor 360 se prepara en cuanto termina la carga (antes de pulsar play)
+  const panoScene = panoId ? (sceneById[panoId] as PanoScene) : FIRST_PANO;
 
-  /* ---- 1. Carga inicial: libreria 360 + imagen del exterior ---- */
+  /* ---- 1. Carga inicial: libreria 360 + TODAS las imagenes ----
+     La primera vez se ve la pantalla de carga con el porcentaje. Las siguientes
+     visitas ya tienen todo guardado en el dispositivo y el play sale al instante. */
   useEffect(() => {
     let alive = true;
 
-    const minimum = new Promise<void>((resolve) => window.setTimeout(resolve, 1600));
+    let seen = false;
+    try {
+      seen = window.localStorage.getItem(tourCacheKey) === "1";
+    } catch {
+      // sin almacenamiento: se muestra la carga normal
+    }
+
     const library = Promise.all([
       import("@photo-sphere-viewer/core"),
       import("@photo-sphere-viewer/markers-plugin"),
     ]).catch(() => undefined);
-    const poster = new Promise<void>((resolve) => {
-      const image = new window.Image();
-      image.onload = () => resolve();
-      image.onerror = () => resolve();
-      image.src = tourIntro.poster;
+
+    const files = preloadAll(TOUR_FILES, (value) => {
+      if (alive && !seen) setProgress(value);
     });
 
-    Promise.all([minimum, library, poster]).then(() => {
-      if (alive) setReady(true);
-    });
+    const finish = () => {
+      if (!alive) return;
+      setProgress(1);
+      setReady(true);
+    };
+
+    if (seen) {
+      // Visita repetida: las imagenes se verifican en segundo plano
+      library.then(finish);
+    } else {
+      const minimum = new Promise<void>((resolve) => window.setTimeout(resolve, 1200));
+      Promise.all([minimum, library, files]).then(() => {
+        try {
+          window.localStorage.setItem(tourCacheKey, "1");
+        } catch {
+          // ignorar
+        }
+        finish();
+      });
+    }
 
     return () => {
       alive = false;
@@ -131,7 +162,6 @@ export default function TourShowroom() {
     const target = sceneById[id];
     if (!target) return;
     setMenuOpen(false);
-    setErrorSrc(null);
     setPick(null);
     if (target.kind === "pano") setPanoId(id);
     setSceneId(id);
@@ -186,8 +216,8 @@ export default function TourShowroom() {
                 </div>
               )}
 
-              {/* Capa 2: recorrido 360 */}
-              {started && panoScene && (
+              {/* Capa 2: recorrido 360 (ya preparado detras de la portada) */}
+              {ready && panoScene && (
                 <div
                   className={`absolute inset-0 transition-opacity duration-700 ${
                     showPano ? "opacity-100" : "pointer-events-none opacity-0"
@@ -256,7 +286,7 @@ export default function TourShowroom() {
 
               {/* Portada */}
               <AnimatePresence>
-                {!started && <TourPoster ready={ready} onStart={() => start()} />}
+                {!started && <TourPoster ready={ready} progress={progress} onStart={() => start()} />}
               </AnimatePresence>
             </div>
           </div>

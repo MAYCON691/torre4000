@@ -6,11 +6,13 @@ import { tourIntro } from "@/data/tour";
 
 type Props = {
   ready: boolean;
+  /** Avance de la descarga de las imagenes, de 0 a 1 */
+  progress: number;
   onStart: () => void;
 };
 
 /** Portada del tour: "Cargando realidad virtual" y luego el boton de play. */
-export default function TourPoster({ ready, onStart }: Props) {
+export default function TourPoster({ ready, progress, onStart }: Props) {
   return (
     <motion.div
       key="poster"
@@ -71,13 +73,19 @@ export default function TourPoster({ ready, onStart }: Props) {
             </span>
           </motion.button>
         ) : (
-          <div role="status" aria-live="polite" className="flex flex-col items-center gap-5">
+          <div role="status" aria-live="polite" className="flex flex-col items-center gap-4">
             <p className="tour-kicker text-sm sm:text-base">
               {tourIntro.loading}
               <span className="tour-dots" aria-hidden />
             </p>
             <span className="relative block h-px w-56 overflow-hidden bg-white/25 sm:w-72">
-              <span className="tour-loadbar absolute inset-y-0 left-0 block w-full bg-gold-400" />
+              <span
+                className="tour-loadbar absolute inset-y-0 left-0 block w-full bg-gold-400"
+                style={{ transform: `scaleX(${progress})` }}
+              />
+            </span>
+            <span className="font-mono text-[11px] tracking-[0.3em] text-white/70">
+              {Math.round(progress * 100)}%
             </span>
           </div>
         )}

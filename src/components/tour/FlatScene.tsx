@@ -96,8 +96,10 @@ export default function FlatScene({ scene, calibrate, onNavigate, onPick }: Prop
               }}
               className="tour-dot-btn"
             >
-              <span className="tour-dot">
-                <span className="tour-ping" />
+              <span className="tour-arrow" data-dir={spot.arrow ?? "up"}>
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M24 5 41 25H30v18H18V25H7z" />
+                </svg>
               </span>
             </button>
             <span aria-hidden className="tour-line" />

@@ -30,6 +30,9 @@ const ESCAPES: Record<string, string> = {
 };
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (c) => ESCAPES[c]);
 
+/** Flecha del hotspot (la misma que se usa sobre la imagen del exterior) */
+const ARROW = `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 41 25H30v18H18V25H7z"/></svg>`;
+
 /** Convierte un hotspot de nuestros datos en un marcador de Photo Sphere Viewer */
 function toMarker(scene: PanoScene, spot: Hotspot, index: number): MarkerConfig {
   const kicker = spot.kicker
@@ -40,9 +43,9 @@ function toMarker(scene: PanoScene, spot: Hotspot, index: number): MarkerConfig 
     id: `${scene.id}:${index}`,
     position: { yaw: `${spot.yaw}deg`, pitch: `${spot.pitch}deg` },
     html:
-      `<span class="tour-hs"><span class="tour-dot"><span class="tour-ping"></span></span>` +
+      `<span class="tour-hs"><span class="tour-arrow" data-dir="${spot.arrow ?? "up"}">${ARROW}</span>` +
       `<span class="tour-tag">${kicker}<span class="tour-tag-title">${escapeHtml(spot.label)}</span></span></span>`,
-    size: { width: 40, height: 40 },
+    size: { width: 44, height: 44 },
     anchor: "center center",
     className: "tour-marker",
     data: { target: spot.target },
