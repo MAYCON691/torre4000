@@ -8,7 +8,6 @@ import { useCallback, useState } from "react";
 import { ctaLink, navLinks } from "@/data/site";
 import { useScrollY } from "@/hooks/useScrollY";
 import Button from "@/components/ui/Button";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 import MobileMenu from "@/components/layout/MobileMenu";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 
@@ -81,17 +80,15 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Derecha escritorio: switch + CTA */}
+          {/* Derecha escritorio: boton principal */}
           <div className="hidden items-center gap-4 xl:flex">
-            <ThemeToggle />
             <Button href={ctaLink.href} variant="light" external>
               {ctaLink.label}
             </Button>
           </div>
 
-          {/* Derecha movil: switch + hamburguesa */}
+          {/* Derecha movil: hamburguesa */}
           <div className="flex items-center gap-2 xl:hidden">
-            <ThemeToggle />
             <button
               type="button"
               aria-label={open ? "Cerrar menú" : "Abrir menú"}

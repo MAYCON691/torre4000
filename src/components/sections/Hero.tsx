@@ -4,18 +4,12 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef, type MouseEvent } from "react";
 import { site } from "@/data/site";
-import { useTheme } from "@/hooks/useTheme";
 
-// Fondo del inicio. Para tener una foto distinta de dia, copia el archivo a
-// public/images y pon su ruta aqui, por ejemplo: "/images/fondo-illimani-dia.jpg"
-// (si queda en null, de dia se usa la misma foto con un tratamiento de luz)
-const IMAGE_NIGHT = "/images/fondo-illimani.jpg";
-const IMAGE_DAY = null as string | null;
+// Fondo del inicio (siempre la version de noche)
+const BACKGROUND = "/images/fondo-illimani.jpg";
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement>(null);
-  const { theme } = useTheme();
-  const backgroundSrc = theme === "day" && IMAGE_DAY ? IMAGE_DAY : IMAGE_NIGHT;
 
   // Movimiento con el scroll: en reposo todo queda IGUAL a la referencia
   const { scrollY } = useScroll();
@@ -56,7 +50,7 @@ export default function Hero() {
         className="hero-bg absolute inset-0 -z-10 will-change-transform"
       >
         <Image
-          src={backgroundSrc}
+          src={BACKGROUND}
           alt="La Paz y El Alto con el Illimani al fondo"
           fill
           priority
@@ -64,8 +58,6 @@ export default function Hero() {
           sizes="100vw"
           className="object-cover object-top"
         />
-        {/* Luz de dia (solo visible en modo dia) */}
-        <span className="hero-sky absolute inset-0" />
       </motion.div>
 
       {/* ---------- La torre (PNG) ---------- */}

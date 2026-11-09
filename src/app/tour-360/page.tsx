@@ -8,7 +8,7 @@ import { tourIntro } from "@/data/tour";
 export const metadata: Metadata = {
   title: "Tour 360",
   description:
-    "Recorre la Torre 4000 en realidad virtual: mirador, restaurante FUEGO 4086 y lobby.",
+    "Recorre la Torre 4000 en realidad virtual: planta baja, restaurante FUEGO 4086 y los dos miradores.",
 };
 
 export default function Tour360Page() {

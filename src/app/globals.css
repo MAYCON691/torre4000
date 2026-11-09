@@ -2,25 +2,22 @@
    TORRE 4000 - globals.css
    --------------------------------------------------------------------------
    1.  Tailwind
-   2.  Tokens modo NOCHE (por defecto) + zonas siempre oscuras
-   3.  Tokens modo DIA
-   4.  Tema Tailwind (colores y fuentes como utilidades)
-   5.  Base (esquinas rectas, scrollbar, seleccion)
-   6.  Navbar
-   7.  Hero del inicio (+ cambio dia/noche)
-   8.  Encabezados de paginas interiores
-   9.  Componentes (cristal, contorno, mapa, grano)
-   10. Transicion suave al cambiar de tema
-   11. Accesibilidad: reduccion de movimiento
+   2.  Colores (negro + dorado)
+   3.  Tema Tailwind (colores y fuentes como utilidades)
+   4.  Base (esquinas rectas, scrollbar, seleccion)
+   5.  Navbar
+   6.  Hero del inicio
+   7.  Encabezados de paginas interiores
+   8.  Componentes (cristal, contorno, mapa, grano)
+   9.  Accesibilidad: reduccion de movimiento
    ========================================================================== */
 
 /* 1. TAILWIND ------------------------------------------------------------ */
 @import "tailwindcss";
 
-/* 2. TOKENS NOCHE -------------------------------------------------------- */
-/* Tambien son las "zonas siempre oscuras": barra superior, inicio, pie de
-   pagina, encabezados con foto y botones de redes se ven igual de dia y
-   de noche.                                                                  */
+/* 2. COLORES ------------------------------------------------------------- */
+/* El sitio es siempre negro y dorado. Las clases .force-dark se mantienen
+   por compatibilidad con los componentes existentes.                         */
 :root,
 .force-dark,
 #inicio,
@@ -51,34 +48,7 @@ aside[aria-label="Redes sociales"] {
     brightness(0.92);
 }
 
-/* 3. TOKENS DIA ---------------------------------------------------------- */
-/* Mas contraste que antes: texto casi negro, dorado oscuro sobre crema.     */
-html[data-theme="day"] {
-  --night-950: #e9e3d6;
-  --night-900: #f6f2ea;
-  --night-800: #ece6d9;
-  --night-700: #ddd5c3;
-  --night-600: #c9bfa8;
-
-  --gold-300: #6b4a10;
-  --gold-400: #8a6418;
-  --gold-500: #a87a22;
-
-  --leaf-400: #36704a;
-
-  --ember-400: #c2500d;
-  --ember-500: #a33c08;
-
-  --ink: #15120d;
-
-  --fire-a: #b8821c;
-  --fire-b: #a4551a;
-  --fire-c: #8c360a;
-
-  --map-filter: none;
-}
-
-/* 4. TEMA TAILWIND ------------------------------------------------------- */
+/* 3. TEMA TAILWIND ------------------------------------------------------- */
 @theme inline {
   --color-night-950: var(--night-950);
   --color-night-900: var(--night-900);
@@ -95,7 +65,7 @@ html[data-theme="day"] {
   --color-ember-400: var(--ember-400);
   --color-ember-500: var(--ember-500);
 
-  /* "white" pasa a ser el color de texto del tema activo */
+  /* "white" es el color de texto principal */
   --color-white: var(--ink);
 
   --font-display: var(--font-roboto-condensed), "Arial Narrow", sans-serif;
@@ -103,7 +73,7 @@ html[data-theme="day"] {
   --font-serif: var(--font-playfair), Georgia, serif;
 }
 
-/* 5. BASE ---------------------------------------------------------------- */
+/* 4. BASE ---------------------------------------------------------------- */
 
 /* Todo el sitio es esquinado: ninguna esquina redondeada */
 *,
@@ -127,14 +97,14 @@ body {
   color: var(--night-950);
 }
 
-/* 6. NAVBAR -------------------------------------------------------------- */
+/* 5. NAVBAR -------------------------------------------------------------- */
 .nav-link {
   transition: color 0.25s ease;
 }
 
-/* 7. HERO DEL INICIO ----------------------------------------------------- */
+/* 6. HERO DEL INICIO ----------------------------------------------------- */
 
-/* 7.1 Textos (tamano proporcional al ancho de pantalla, como la referencia) */
+/* 6.1 Textos (tamano proporcional al ancho de pantalla, como la referencia) */
 .hero-title {
   font-size: clamp(2.4rem, 5.3vw, 8rem);
   line-height: 0.98;
@@ -165,7 +135,7 @@ body {
   animation: hero-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 1.1s forwards;
 }
 
-/* 7.2 Torre: se construye de abajo hacia arriba */
+/* 6.2 Torre: se construye de abajo hacia arriba */
 .tower-build {
   animation: tower-build 2s cubic-bezier(0.22, 0.8, 0.2, 1) 0.6s both;
 }
@@ -174,53 +144,12 @@ body {
   filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.5));
 }
 
-/* 7.3 Modo DIA del inicio: la foto se aclara, se enfria y sale el sol.
-   En modo noche NO se toca nada (queda igual que la referencia).            */
-.hero-bg img {
-  transition: filter 0.8s ease;
-}
-
-html[data-theme="day"] .hero-bg img {
-  filter: brightness(1.14) saturate(0.82) hue-rotate(-16deg) contrast(0.97);
-}
-
-.hero-sky {
-  opacity: 0;
-  mix-blend-mode: screen;
-  transition: opacity 0.8s ease;
-  background:
-    radial-gradient(
-      48% 42% at 76% 14%,
-      rgba(255, 240, 200, 0.85) 0%,
-      rgba(255, 214, 140, 0.35) 38%,
-      transparent 70%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 200, 130, 0.3) 0%,
-      rgba(255, 232, 200, 0.16) 42%,
-      transparent 72%
-    );
-}
-
-html[data-theme="day"] .hero-sky {
-  opacity: 1;
-}
-
-/* Textos un poco mas reforzados para que se lean sobre la foto clara */
-html[data-theme="day"] .hero-title,
-html[data-theme="day"] .hero-subtitle {
-  text-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.55),
-    0 4px 28px rgba(0, 0, 0, 0.7);
-}
-
-/* 7.4 Indicador "Desliza" */
+/* 6.3 Indicador "Desliza" */
 .hero-scroll-dot {
   animation: hero-scroll 1.8s ease-in-out infinite;
 }
 
-/* 7.5 Keyframes */
+/* 6.4 Keyframes */
 @keyframes hero-in {
   to {
     opacity: 1;
@@ -248,16 +177,16 @@ html[data-theme="day"] .hero-subtitle {
   }
 }
 
-/* 8. ENCABEZADOS DE PAGINAS INTERIORES ----------------------------------- */
+/* 7. ENCABEZADOS DE PAGINAS INTERIORES ----------------------------------- */
 .page-title {
   font-size: clamp(2.8rem, 8.5vw, 9rem);
   line-height: 0.92;
   text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55);
 }
 
-/* 9. COMPONENTES --------------------------------------------------------- */
+/* 8. COMPONENTES --------------------------------------------------------- */
 
-/* 9.1 Cristal transparente (tarjetas de eventos) */
+/* 8.1 Cristal transparente (tarjetas de eventos) */
 .glass {
   background: rgba(0, 0, 0, 0.34);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
@@ -266,14 +195,10 @@ html[data-theme="day"] .hero-subtitle {
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
 }
 
-/* 9.2 Texto solo con contorno */
+/* 8.2 Texto solo con contorno */
 .outline-text {
   color: transparent;
   -webkit-text-stroke: 1px color-mix(in srgb, var(--ink) 38%, transparent);
-}
-
-html[data-theme="day"] .outline-text {
-  -webkit-text-stroke-color: color-mix(in srgb, var(--ink) 48%, transparent);
 }
 
 .outline-text-gold {
@@ -281,7 +206,7 @@ html[data-theme="day"] .outline-text {
   -webkit-text-stroke: 1px var(--gold-400);
 }
 
-/* 9.3 Texto con degradado de fuego (restaurante) */
+/* 8.3 Texto con degradado de fuego (restaurante) */
 .text-fire {
   background: linear-gradient(
     180deg,
@@ -294,7 +219,7 @@ html[data-theme="day"] .outline-text {
   color: transparent;
 }
 
-/* 9.4 Mapa: oscuro en modo noche, a color al pasar el mouse */
+/* 8.4 Mapa: oscuro, a color al pasar el mouse */
 .map-frame iframe {
   filter: var(--map-filter);
   transition: filter 0.7s ease;
@@ -304,7 +229,7 @@ html[data-theme="day"] .outline-text {
   filter: none;
 }
 
-/* 9.5 Grano de pelicula sutil (encabezados con foto) */
+/* 8.5 Grano de pelicula sutil (encabezados con foto) */
 .grain::after {
   content: "";
   position: absolute;
@@ -337,28 +262,7 @@ html[data-theme="day"] .outline-text {
   }
 }
 
-/* 10. TRANSICION DE TEMA ------------------------------------------------- */
-/* La clase .theme-anim se pone 0.5 s al cambiar de modo dia/noche */
-html.theme-anim,
-html.theme-anim *,
-html.theme-anim *::before,
-html.theme-anim *::after {
-  transition-property:
-    background-color, color, border-color, fill, stroke, box-shadow !important;
-  transition-duration: 0.4s !important;
-  transition-timing-function: ease !important;
-}
-
-/* El cielo y la foto del inicio tienen su propia transicion, mas lenta */
-html.theme-anim .hero-sky {
-  transition: opacity 0.8s ease !important;
-}
-
-html.theme-anim .hero-bg img {
-  transition: filter 0.8s ease !important;
-}
-
-/* 11. ACCESIBILIDAD ------------------------------------------------------ */
+/* 9. ACCESIBILIDAD ------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .hero-line,
   .hero-fade,
@@ -375,12 +279,5 @@ html.theme-anim .hero-bg img {
 
   .grain::after {
     animation: none;
-  }
-
-  html.theme-anim,
-  html.theme-anim *,
-  html.theme-anim *::before,
-  html.theme-anim *::after {
-    transition: none !important;
   }
 }

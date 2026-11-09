@@ -1,8 +1,11 @@
 /* ==========================================================================
    TORRE 4000 - Datos del Tour 360
    --------------------------------------------------------------------------
-   Para mover un hotspot: abre  /tour-360#calibrar  y haz clic en la escena.
-   El panel de abajo te da las coordenadas listas para copiar aqui.
+   Recorrido (de abajo hacia arriba):
+     Exterior > Planta baja (2) > Restaurante (2) > Mirador 2 (3) > Mirador 1 (2)
+
+   Para mover una flecha: abre  /tour-360#calibrar  y haz clic en la escena.
+   El panel de abajo te da el yaw y pitch listos para copiar aqui.
    ========================================================================== */
 
 /** Hacia donde apunta la flecha del hotspot (por defecto "up") */
@@ -20,7 +23,7 @@ export type Hotspot = {
   pitch: number;
 };
 
-/** Hotspot sobre la imagen plana (exterior): posicion en % de la imagen */
+/** Hotspot sobre una imagen plana: posicion en % de la imagen */
 export type FlatHotspot = {
   target: string;
   label: string;
@@ -52,81 +55,63 @@ export type TourScene = FlatScene | PanoScene;
 
 /**
  * Si cambias las fotos 360 y quieres que los visitantes vuelvan a ver la pantalla
- * de carga con las imagenes nuevas, cambia el numero (v1 -> v2).
+ * de carga con las imagenes nuevas, cambia el numero (v2 -> v3).
  */
-export const tourCacheKey = "t4-tour-cargado-v1";
+export const tourCacheKey = "t4-tour-cargado-v2";
 
 export const tourIntro = {
   eyebrow: "Realidad virtual",
   title: "Tour 360",
-  text: "Recorre el mirador, el restaurante FUEGO 4086 y el lobby. Toca los puntos para entrar y arrastra para mirar alrededor.",
+  text: "Recorre la planta baja, el restaurante FUEGO 4086 y los dos miradores. Toca las flechas para avanzar y arrastra para mirar alrededor.",
   loading: "Cargando realidad virtual",
   startLabel: "Iniciar tour 360",
+  /** Imagen de la portada (antes de dar play) */
   poster: "/imagenparatour.jpg",
 };
+
+/** Nombres de las zonas, en el orden del menu lateral */
+export const tourZones = ["Exterior", "Planta baja", "Restaurante", "Mirador 2", "Mirador 1"];
 
 export const tourScenes: TourScene[] = [
   /* ------------------------------ EXTERIOR ------------------------------ */
   {
     id: "exterior",
-    kind: "flat",
+    kind: "pano",
     zone: "Exterior",
     title: "Torre 4000",
     kicker: "Exterior",
-    src: "/imagenparatour.jpg",
+    src: "/tour/torre4000.jpg",
+    start: { yaw: -10, pitch: 8 },
     hotspots: [
-      {
-        target: "mirador",
-        label: "Ver el mirador",
-        kicker: "Nivel superior",
-        x: 50,
-        y: 22,
-        side: "right",
-      },
-      {
-        target: "restaurante",
-        label: "Ver el restaurante",
-        kicker: "Nivel medio · FUEGO 4086",
-        x: 50,
-        y: 50,
-        side: "left",
-      },
-      {
-        target: "lobby",
-        label: "Ver el lobby",
-        kicker: "Planta baja",
-        x: 50,
-        y: 72,
-        side: "right",
-      },
+      { target: "planta-baja", label: "Entrar a la torre", kicker: "Planta baja", yaw: -10, pitch: -6 },
     ],
   },
 
-  /* ------------------------------- MIRADOR ------------------------------ */
+  /* ----------------------------- PLANTA BAJA ---------------------------- */
   {
-    id: "mirador",
+    id: "planta-baja",
     kind: "pano",
-    zone: "Mirador",
-    title: "Mirador",
-    kicker: "Nivel superior",
-    src: "/360-1.jpg",
+    zone: "Planta baja",
+    title: "Planta baja",
+    kicker: "Nivel de ingreso",
+    src: "/tour/plantabaja.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "mirador-vista", label: "Vista panorámica", kicker: "Siguiente", yaw: 70, pitch: -8 },
-      { target: "restaurante", label: "Bajar al restaurante", kicker: "Nivel medio", arrow: "down", yaw: -110, pitch: -18 },
+      { target: "planta-baja-2", label: "Seguir recorriendo", kicker: "Planta baja", yaw: 5, pitch: -28 },
+      { target: "exterior", label: "Salir a la calle", kicker: "Exterior", arrow: "down", yaw: 150, pitch: -28 },
     ],
   },
   {
-    id: "mirador-vista",
+    id: "planta-baja-2",
     kind: "pano",
-    zone: "Mirador",
-    title: "Vista panorámica",
-    kicker: "Mirador",
-    src: "/360-2.jpg",
+    zone: "Planta baja",
+    title: "Planta baja · Vista 2",
+    kicker: "Nivel de ingreso",
+    src: "/tour/plantabaja-1.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "mirador", label: "Volver al mirador", arrow: "down", yaw: 180, pitch: -10 },
-      { target: "exterior", label: "Ver la torre por fuera", kicker: "Exterior", yaw: -70, pitch: -6 },
+      { target: "restaurante", label: "Subir al restaurante", kicker: "FUEGO 4086", yaw: 0, pitch: -30 },
+      { target: "planta-baja", label: "Volver", arrow: "down", yaw: 170, pitch: -28 },
     ],
   },
 
@@ -137,52 +122,93 @@ export const tourScenes: TourScene[] = [
     zone: "Restaurante",
     title: "Restaurante FUEGO 4086",
     kicker: "Nivel medio",
-    src: "/360-3.jpg",
+    src: "/tour/restaurante4086.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "restaurante-salon", label: "Salón principal", kicker: "Siguiente", yaw: 60, pitch: -5 },
-      { target: "mirador", label: "Subir al mirador", kicker: "Nivel superior", yaw: -120, pitch: 12 },
-      { target: "lobby", label: "Bajar al lobby", kicker: "Planta baja", arrow: "down", yaw: 150, pitch: -20 },
+      { target: "restaurante-2", label: "Seguir recorriendo", kicker: "Siguiente", yaw: 80, pitch: -28 },
+      { target: "planta-baja-2", label: "Bajar a planta baja", kicker: "Planta baja", arrow: "down", yaw: -150, pitch: -32 },
     ],
   },
   {
-    id: "restaurante-salon",
+    id: "restaurante-2",
     kind: "pano",
     zone: "Restaurante",
-    title: "Salón principal",
+    title: "Restaurante · Vista 2",
     kicker: "FUEGO 4086",
-    src: "/360-4.jpg",
+    src: "/tour/restaurante4086-1.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "restaurante", label: "Volver a la entrada", arrow: "down", yaw: 180, pitch: -8 },
+      { target: "mirador-2", label: "Subir al mirador", kicker: "Mirador 2", yaw: 0, pitch: -30 },
+      { target: "restaurante", label: "Volver a la entrada", arrow: "down", yaw: 170, pitch: -28 },
     ],
   },
 
-  /* -------------------------------- LOBBY ------------------------------- */
+  /* ------------------------------ MIRADOR 2 ----------------------------- */
   {
-    id: "lobby",
+    id: "mirador-2",
     kind: "pano",
-    zone: "Lobby",
-    title: "Lobby",
-    kicker: "Planta baja",
-    src: "/360-5.jpg",
+    zone: "Mirador 2",
+    title: "Mirador 2",
+    kicker: "Nivel alto",
+    src: "/tour/mirador2.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "lobby-ingreso", label: "Ingreso principal", kicker: "Siguiente", yaw: 50, pitch: -6 },
-      { target: "restaurante", label: "Subir al restaurante", kicker: "Nivel medio", yaw: -100, pitch: 10 },
+      { target: "mirador-2-1", label: "Seguir por el mirador", kicker: "Siguiente", yaw: 60, pitch: -28 },
+      { target: "restaurante-2", label: "Bajar al restaurante", kicker: "FUEGO 4086", arrow: "down", yaw: -100, pitch: -32 },
     ],
   },
   {
-    id: "lobby-ingreso",
+    id: "mirador-2-1",
     kind: "pano",
-    zone: "Lobby",
-    title: "Ingreso principal",
-    kicker: "Planta baja",
-    src: "/360-6.jpg",
+    zone: "Mirador 2",
+    title: "Mirador 2 · Vista 2",
+    kicker: "Nivel alto",
+    src: "/tour/mirador2-1.jpg",
     start: { yaw: 0, pitch: 0 },
     hotspots: [
-      { target: "lobby", label: "Entrar al lobby", yaw: 180, pitch: -6 },
-      { target: "exterior", label: "Salir al exterior", kicker: "Exterior", yaw: 0, pitch: -4 },
+      { target: "mirador-2-2", label: "Seguir por el mirador", kicker: "Siguiente", yaw: 45, pitch: -28 },
+      { target: "mirador-2", label: "Volver", arrow: "down", yaw: 180, pitch: -28 },
+    ],
+  },
+  {
+    id: "mirador-2-2",
+    kind: "pano",
+    zone: "Mirador 2",
+    title: "Mirador 2 · Vista 3",
+    kicker: "Nivel alto",
+    src: "/tour/mirador2-2.jpg",
+    start: { yaw: 0, pitch: 0 },
+    hotspots: [
+      { target: "mirador-1", label: "Subir a la punta", kicker: "Mirador 1", yaw: 0, pitch: -32 },
+      { target: "mirador-2-1", label: "Volver", arrow: "down", yaw: 170, pitch: -28 },
+    ],
+  },
+
+  /* ------------------------------ MIRADOR 1 ----------------------------- */
+  {
+    id: "mirador-1",
+    kind: "pano",
+    zone: "Mirador 1",
+    title: "Mirador 1 · La punta",
+    kicker: "El punto más alto",
+    src: "/tour/mirador1.jpg",
+    start: { yaw: 0, pitch: 0 },
+    hotspots: [
+      { target: "mirador-1-1", label: "Seguir recorriendo", kicker: "Siguiente", yaw: 50, pitch: -35 },
+      { target: "mirador-2-2", label: "Bajar al mirador 2", kicker: "Mirador 2", arrow: "down", yaw: 180, pitch: -35 },
+    ],
+  },
+  {
+    id: "mirador-1-1",
+    kind: "pano",
+    zone: "Mirador 1",
+    title: "Mirador 1 · Vista 2",
+    kicker: "El punto más alto",
+    src: "/tour/mirador1-1.jpg",
+    start: { yaw: 0, pitch: 0 },
+    hotspots: [
+      { target: "mirador-1", label: "Volver", arrow: "down", yaw: 180, pitch: -35 },
+      { target: "exterior", label: "Ver la torre por fuera", kicker: "Exterior", yaw: -90, pitch: 5 },
     ],
   },
 ];

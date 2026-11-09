@@ -1,4 +1,3 @@
-import RegisterSW from "@/components/RegisterSW";
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Roboto, Roboto_Condensed } from "next/font/google";
 import { site } from "@/data/site";
@@ -6,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import FloatingSocials from "@/components/layout/FloatingSocials";
 import MotionProvider from "@/components/layout/MotionProvider";
 import Navbar from "@/components/layout/Navbar";
+import RegisterSW from "@/components/RegisterSW";
 import "./globals.css";
 
 const display = Roboto_Condensed({
@@ -49,10 +49,6 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
-// Aplica el tema guardado ANTES de pintar la pagina (evita el parpadeo).
-// Por defecto el sitio inicia en modo noche.
-const themeScript = `try{var t=localStorage.getItem("torre4000-theme");document.documentElement.dataset.theme=t==="day"?"day":"night"}catch(e){document.documentElement.dataset.theme="night"}`;
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -60,12 +56,8 @@ export default function RootLayout({
     <html
       lang="es"
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
       className={`${display.variable} ${body.variable} ${serif.variable}`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="bg-night-900 font-body text-white antialiased">
         <MotionProvider>
           <Navbar />
@@ -73,7 +65,7 @@ export default function RootLayout({
           <Footer />
           <FloatingSocials />
         </MotionProvider>
-      <RegisterSW />
+        <RegisterSW />
       </body>
     </html>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import type { RefObject } from "react";
 import { whatsappLink } from "@/data/site";
-import { tourScenes, type TourScene } from "@/data/tour";
+import { tourScenes, tourZones, type TourScene } from "@/data/tour";
 import type { PanoApi } from "@/components/tour/PanoViewer";
 
 type Props = {
@@ -16,8 +16,6 @@ type Props = {
   onMenu: (open: boolean) => void;
   onToggleExpand: () => void;
 };
-
-const ZONES = ["Exterior", "Mirador", "Restaurante", "Lobby"];
 
 function Icon({ name }: { name: "menu" | "expand" | "close" | "chat" | "prev" | "next" | "back" }) {
   const common = {
@@ -88,6 +86,7 @@ export default function TourHud({
   const prev = tourScenes[(index - 1 + tourScenes.length) % tourScenes.length];
   const next = tourScenes[(index + 1) % tourScenes.length];
   const isPano = scene.kind === "pano";
+  const isExterior = scene.id === "exterior";
 
   return (
     <>
@@ -135,9 +134,9 @@ export default function TourHud({
           <button
             type="button"
             role="tab"
-            aria-selected={isPano}
-            data-active={isPano}
-            onClick={() => onGo("mirador")}
+            aria-selected={!isExterior}
+            data-active={!isExterior}
+            onClick={() => onGo("planta-baja")}
           >
             <b>02</b> Recorrido
           </button>
@@ -169,13 +168,13 @@ export default function TourHud({
 
       {/* ----------------------------- Indicacion ------------------------------ */}
       <p key={`hint-${scene.id}`} className="tour-hint" aria-hidden>
-        {isPano ? "Desliza para mirar alrededor" : "Toca un punto para entrar"}
+        {isExterior ? "Toca la flecha para entrar" : "Desliza para mirar · toca una flecha para avanzar"}
       </p>
 
       {/* ----------------------------- Barra inferior ---------------------------- */}
       <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center px-3 sm:bottom-6">
         <div className="tour-bar">
-          {isPano && (
+          {!isExterior && (
             <button
               type="button"
               onClick={() => onGo("exterior")}
@@ -277,7 +276,7 @@ export default function TourHud({
                 </button>
               </div>
 
-              {ZONES.map((zone) => (
+              {tourZones.map((zone) => (
                 <div key={zone} className="mb-5">
                   <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-gold-400">
                     {zone}
