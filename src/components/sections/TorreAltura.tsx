@@ -12,38 +12,40 @@ import { useRef } from "react";
    Altura de la Torre 4000 vs otras torres del mundo.
    Al hacer scroll la pagina queda anclada: sube la montana, aparece la
    Torre 4000 contando hasta 4200 m.s.n.m. y despues crece cada torre.
-   Para cambiar datos edita solo esta lista.
+   Para cambiar datos o iconos edita solo esta lista.
    ========================================================================== */
 const TOWERS = [
-  { name: "Torre de Strat Skypod", meters: 350 },
-  { name: "Torre de Macao", meters: 338 },
-  { name: "Torre de Tokio", meters: 333 },
-  { name: "Torre Eiffel", meters: 333 },
-  { name: "Torre de Sidney", meters: 305 },
-  { name: "Aguja Espacial", meters: 184 },
-  { name: "Monumento a Washington", meters: 169 },
-  { name: "Estatua de la Libertad", meters: 93 },
+  { name: "Torre de Strat Skypod", meters: 350, icon: "/images/torrestratskypod.png" },
+  { name: "Torre de Macao", meters: 338, icon: "/images/torremacao.png" },
+  { name: "Torre de Tokio", meters: 333, icon: "/images/torretokio.png" },
+  { name: "Torre Eiffel", meters: 333, icon: "/images/torreeiffel.png" },
+  { name: "Torre de Sidney", meters: 305, icon: "/images/torresidney.png" },
+  { name: "Aguja Espacial", meters: 184, icon: "/images/agujaespacial.png" },
+  { name: "Monumento a Washington", meters: 169, icon: "/images/monumentowashington.png" },
+  { name: "Estatua de la Libertad", meters: 93, icon: "/images/estatualibertad.png" },
 ];
+
+const TORRE_4000_ICON = "/images/torre4000icono.png";
 
 const ALTITUDE = 4200;
 const MAX_METERS = 350;
 
-/** Silueta de aguja (cuadrada, sin esquinas redondeadas) */
-const SPIRE_SHAPE = "polygon(46% 0, 54% 0, 100% 100%, 0 100%)";
-
 type TowerProps = {
   name: string;
+  icon: string;
   meters: number;
   index: number;
   progress: MotionValue<number>;
 };
 
 /** Una torre: crece de abajo hacia arriba y su altura cuenta desde 0 */
-function Tower({ name, meters, index, progress }: TowerProps) {
+function Tower({ name, icon, meters, index, progress }: TowerProps) {
   const start = 0.3 + index * 0.07;
   const end = start + 0.1;
 
   const rise = useTransform(progress, [start, end], [0, 1]);
+  // El icono se descubre de abajo hacia arriba (sin deformarse)
+  const reveal = useTransform(rise, (v) => `inset(${((1 - v) * 100).toFixed(1)}% 0 0 0)`);
   const appear = useTransform(progress, [start, start + 0.05], [0, 1]);
   const count = useTransform(progress, [start, end], [0, meters]);
   const label = useTransform(count, (value) => String(Math.round(value)));
@@ -61,11 +63,13 @@ function Tower({ name, meters, index, progress }: TowerProps) {
         <span className="hidden text-xs md:inline">m</span>
       </motion.p>
 
-      <div className="flex w-full items-end justify-center" style={{ height: `${height}%` }}>
-        <motion.span
-          aria-hidden
-          style={{ scaleY: rise, clipPath: SPIRE_SHAPE, transformOrigin: "50% 100%" }}
-          className="block h-full w-[70%] max-w-9 bg-linear-to-t from-gold-500 via-gold-400 to-gold-300"
+      <div className="relative w-full" style={{ height: `${height}%` }}>
+        <motion.img
+          src={icon}
+          alt={name}
+          draggable={false}
+          style={{ clipPath: reveal }}
+          className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 select-none object-contain object-bottom"
         />
       </div>
 
@@ -98,6 +102,7 @@ export default function TorreAltura() {
 
   // Torre 4000 y numero de altitud
   const bigRise = useTransform(scrollYProgress, [0.08, 0.24], [0, 1]);
+  const bigReveal = useTransform(bigRise, (v) => `inset(${((1 - v) * 100).toFixed(1)}% 0 0 0)`);
   const altitude = useTransform(scrollYProgress, [0.08, 0.26], [0, ALTITUDE]);
   const altitudeText = useTransform(altitude, (value) => String(Math.round(value)));
   const altitudeOpacity = useTransform(scrollYProgress, [0.06, 0.14], [0, 1]);
@@ -169,11 +174,13 @@ export default function TorreAltura() {
             </p>
 
             {/* Torre 4000 sobre la montana */}
-            <div className="absolute left-[2%] top-0 flex h-[36%] w-[12%] items-end justify-center">
-              <motion.span
-                aria-hidden
-                style={{ scaleY: bigRise, clipPath: SPIRE_SHAPE, transformOrigin: "50% 100%" }}
-                className="block h-full w-[70%] max-w-12 bg-linear-to-t from-gold-500 via-gold-300 to-white"
+            <div className="absolute left-[2%] top-0 h-[36%] w-[12%]">
+              <motion.img
+                src={TORRE_4000_ICON}
+                alt="Torre 4000"
+                draggable={false}
+                style={{ clipPath: bigReveal }}
+                className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 select-none object-contain object-bottom"
               />
             </div>
 
@@ -197,6 +204,7 @@ export default function TorreAltura() {
                 <Tower
                   key={tower.name}
                   name={tower.name}
+                  icon={tower.icon}
                   meters={tower.meters}
                   index={index}
                   progress={scrollYProgress}

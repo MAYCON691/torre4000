@@ -6,6 +6,7 @@ import type { RefObject } from "react";
 import { whatsappLink } from "@/data/site";
 import { tourScenes, tourZones, type TourScene } from "@/data/tour";
 import type { PanoApi } from "@/components/tour/PanoViewer";
+import TourGuide from "@/components/tour/TourGuide";
 
 type Props = {
   scene: TourScene;
@@ -72,7 +73,7 @@ function Icon({ name }: { name: "menu" | "expand" | "close" | "chat" | "prev" | 
   }
 }
 
-/** Interfaz sobre el visor: titulo, pestanas, menu, barra de escenas y zoom. */
+/** Interfaz sobre el visor: titulo, pestanas, menu, torre guia, barra de escenas y zoom. */
 export default function TourHud({
   scene,
   expanded,
@@ -170,6 +171,9 @@ export default function TourHud({
       <p key={`hint-${scene.id}`} className="tour-hint" aria-hidden>
         {isExterior ? "Toca la flecha para entrar" : "Desliza para mirar · toca una flecha para avanzar"}
       </p>
+
+      {/* ------------------------- Torre guia (donde estas) ------------------------ */}
+      <TourGuide sceneId={scene.id} onGo={onGo} />
 
       {/* ----------------------------- Barra inferior ---------------------------- */}
       <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center px-3 sm:bottom-6">
