@@ -9,12 +9,13 @@ import { tourScenes } from "@/data/tour";
    - al cambiar de recorrido sube o baja a ese nivel
    - dentro del mismo recorrido solo se mueve de izquierda a derecha
    Para mover un nivel cambia su "y" (0 = punta, 100 = suelo).
+   "dy" separa un poco el nombre cuando dos niveles estan muy juntos.
    ========================================================================== */
-const LEVELS = [
-  { zone: "Mirador 1", y: 15 },
-  { zone: "Mirador 2", y: 37 },
-  { zone: "Restaurante", y: 58 },
-  { zone: "Planta baja", y: 80 },
+const LEVELS: { zone: string; y: number; dy?: number }[] = [
+  { zone: "Mirador 1", y: 20 },
+  { zone: "Mirador 2", y: 54, dy: -8 },
+  { zone: "Restaurante", y: 60, dy: 8 },
+  { zone: "Planta baja", y: 82 },
   { zone: "Exterior", y: 96 },
 ];
 
@@ -27,6 +28,14 @@ type Props = {
 function half(y: number) {
   return 4 + Math.max(0, y - 10) * 0.19;
 }
+
+/** Cruces del armazon entre un nivel y el siguiente */
+const BRACES = LEVELS.slice(0, 3)
+  .map((a, i) => {
+    const b = LEVELS[i + 1];
+    return `M${26 - half(a.y)} ${a.y} L${26 + half(b.y)} ${b.y} M${26 + half(a.y)} ${a.y} L${26 - half(b.y)} ${b.y}`;
+  })
+  .join(" ");
 
 export default function TourGuide({ sceneId, onGo }: Props) {
   const scene = tourScenes.find((item) => item.id === sceneId) ?? tourScenes[0];
@@ -64,7 +73,7 @@ export default function TourGuide({ sceneId, onGo }: Props) {
         />
         {/* Cruces del armazon */}
         <path
-          d={`M${26 - half(12)} 12 L${26 + half(37)} 37 M${26 + half(12)} 12 L${26 - half(37)} 37 M${26 - half(37)} 37 L${26 + half(58)} 58 M${26 + half(37)} 37 L${26 - half(58)} 58 M${26 - half(58)} 58 L${26 + half(80)} 80 M${26 + half(58)} 58 L${26 - half(80)} 80`}
+          d={BRACES}
           fill="none"
           stroke="rgba(255,255,255,0.2)"
           strokeWidth="1"
@@ -99,8 +108,8 @@ export default function TourGuide({ sceneId, onGo }: Props) {
             onClick={() => target && onGo(target.id)}
             aria-label={`Ir a ${item.zone}`}
             aria-current={active}
-            style={{ top: `${item.y}%` }}
-            className={`pointer-events-auto absolute right-[56px] -translate-y-1/2 whitespace-nowrap px-1 text-right font-mono text-[9px] uppercase tracking-[0.18em] transition-colors sm:right-[66px] sm:text-[10px] ${
+            style={{ top: `${item.y}%`, transform: `translateY(calc(-50% + ${item.dy ?? 0}px))` }}
+            className={`pointer-events-auto absolute right-[56px] whitespace-nowrap px-1 text-right font-mono text-[9px] uppercase tracking-[0.18em] transition-colors sm:right-[66px] sm:text-[10px] ${
               active ? "text-gold-300" : "text-white/50 hover:text-white max-sm:hidden"
             }`}
             data-active={active}
