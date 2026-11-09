@@ -5,7 +5,9 @@ import { tourScenes } from "@/data/tour";
 
 /* ==========================================================================
    Torre guia: una torre semitransparente al costado derecho del visor.
-   Un punto rojo sube y baja por ella segun la escena donde estas.
+   Un punto rojo marca en que recorrido estas:
+   - al cambiar de recorrido sube o baja a ese nivel
+   - dentro del mismo recorrido solo se mueve de izquierda a derecha
    Para mover un nivel cambia su "y" (0 = punta, 100 = suelo).
    ========================================================================== */
 const LEVELS = [
@@ -30,10 +32,12 @@ export default function TourGuide({ sceneId, onGo }: Props) {
   const scene = tourScenes.find((item) => item.id === sceneId) ?? tourScenes[0];
   const level = LEVELS.find((item) => item.zone === scene.zone) ?? LEVELS[LEVELS.length - 1];
 
-  // Escenas de la misma zona: el punto se mueve un poco dentro del nivel
+  // Dentro de un mismo nivel el punto solo se mueve de izquierda a derecha
   const sameZone = tourScenes.filter((item) => item.zone === scene.zone);
-  const sub = sameZone.indexOf(scene) - (sameZone.length - 1) / 2;
-  const y = level.y + sub * 4;
+  const pos = sameZone.length > 1 ? sameZone.indexOf(scene) / (sameZone.length - 1) : 0.5;
+  const y = level.y;
+  const reach = half(level.y) + 3; // mitad del ancho de la plataforma
+  const x = ((26 + (pos - 0.5) * 2 * reach) / 52) * 100;
 
   return (
     <nav
@@ -107,38 +111,39 @@ export default function TourGuide({ sceneId, onGo }: Props) {
       })}
 
       {/* ---------------- Punto rojo ---------------- */}
-      <motion.div
-        aria-hidden
-        initial={false}
-        animate={{ top: `${y}%` }}
-        transition={{ type: "spring", stiffness: 90, damping: 16, mass: 0.9 }}
-        className="absolute right-[16px] h-0 w-0 sm:right-[20px]"
-      >
-        <svg width="28" height="28" viewBox="0 0 28 28" className="absolute -left-[14px] -top-[14px] overflow-visible">
-          {/* Onda al cambiar de escena */}
-          <motion.circle
-            key={sceneId}
-            cx="14"
-            cy="14"
-            fill="none"
-            stroke="#ff3b30"
-            strokeWidth="2"
-            initial={{ r: 4, opacity: 0.9 }}
-            animate={{ r: 16, opacity: 0 }}
-            transition={{ duration: 1.1, ease: "easeOut" }}
-          />
-          {/* Latido continuo */}
-          <motion.circle
-            cx="14"
-            cy="14"
-            fill="#ff3b30"
-            initial={false}
-            animate={{ r: [8, 12], opacity: [0.35, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
-          />
-          <circle cx="14" cy="14" r="5" fill="#ff3b30" stroke="#ffffff" strokeWidth="1.5" />
-        </svg>
-      </motion.div>
+      <div aria-hidden className="absolute inset-y-0 right-0 w-[46px] sm:w-[54px]">
+        <motion.div
+          initial={false}
+          animate={{ top: `${y}%`, left: `${x}%` }}
+          transition={{ type: "spring", stiffness: 90, damping: 16, mass: 0.9 }}
+          className="absolute h-0 w-0"
+        >
+          <svg width="28" height="28" viewBox="0 0 28 28" className="absolute -left-[14px] -top-[14px] overflow-visible">
+            {/* Onda al cambiar de escena */}
+            <motion.circle
+              key={sceneId}
+              cx="14"
+              cy="14"
+              fill="none"
+              stroke="#ff3b30"
+              strokeWidth="2"
+              initial={{ r: 4, opacity: 0.9 }}
+              animate={{ r: 16, opacity: 0 }}
+              transition={{ duration: 1.1, ease: "easeOut" }}
+            />
+            {/* Latido continuo */}
+            <motion.circle
+              cx="14"
+              cy="14"
+              fill="#ff3b30"
+              initial={false}
+              animate={{ r: [8, 12], opacity: [0.35, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+            />
+            <circle cx="14" cy="14" r="5" fill="#ff3b30" stroke="#ffffff" strokeWidth="1.5" />
+          </svg>
+        </motion.div>
+      </div>
     </nav>
   );
 }

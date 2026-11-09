@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import type { RefObject } from "react";
-import { whatsappLink } from "@/data/site";
 import { tourScenes, tourZones, type TourScene } from "@/data/tour";
 import type { PanoApi } from "@/components/tour/PanoViewer";
 import TourGuide from "@/components/tour/TourGuide";
@@ -18,7 +16,7 @@ type Props = {
   onToggleExpand: () => void;
 };
 
-function Icon({ name }: { name: "menu" | "expand" | "close" | "chat" | "prev" | "next" | "back" }) {
+function Icon({ name }: { name: "menu" | "expand" | "close" }) {
   const common = {
     viewBox: "0 0 24 24",
     className: "h-4 w-4",
@@ -46,34 +44,10 @@ function Icon({ name }: { name: "menu" | "expand" | "close" | "chat" | "prev" | 
           <path d="M5 5l14 14M19 5L5 19" />
         </svg>
       );
-    case "chat":
-      return (
-        <svg {...common}>
-          <path d="M4 5h16v11H9l-5 4z" />
-        </svg>
-      );
-    case "prev":
-      return (
-        <svg {...common}>
-          <path d="M15 5l-7 7 7 7" />
-        </svg>
-      );
-    case "next":
-      return (
-        <svg {...common}>
-          <path d="M9 5l7 7-7 7" />
-        </svg>
-      );
-    case "back":
-      return (
-        <svg {...common}>
-          <path d="M20 12H4M10 6l-6 6 6 6" />
-        </svg>
-      );
   }
 }
 
-/** Interfaz sobre el visor: titulo, pestanas, menu, torre guia, barra de escenas y zoom. */
+/** Interfaz sobre el visor: titulo, pestanas, menu, torre guia y zoom (+ / -). */
 export default function TourHud({
   scene,
   expanded,
@@ -83,9 +57,6 @@ export default function TourHud({
   onMenu,
   onToggleExpand,
 }: Props) {
-  const index = tourScenes.findIndex((item) => item.id === scene.id);
-  const prev = tourScenes[(index - 1 + tourScenes.length) % tourScenes.length];
-  const next = tourScenes[(index + 1) % tourScenes.length];
   const isPano = scene.kind === "pano";
   const isExterior = scene.id === "exterior";
 
@@ -141,21 +112,7 @@ export default function TourHud({
           >
             <b>02</b> Recorrido
           </button>
-          <Link href="/contacto#ruta" role="tab" aria-selected={false}>
-            <b>03</b> Ubicación
-          </Link>
         </div>
-
-        <a
-          href={whatsappLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="tour-btn tour-btn--accent"
-          aria-label="Consultar por WhatsApp"
-        >
-          <Icon name="chat" />
-          <span className="hidden sm:inline">Consultar</span>
-        </a>
 
         <button
           type="button"
@@ -175,75 +132,29 @@ export default function TourHud({
       {/* ------------------------- Torre guia (donde estas) ------------------------ */}
       <TourGuide sceneId={scene.id} onGo={onGo} />
 
-      {/* ----------------------------- Barra inferior ---------------------------- */}
-      <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center px-3 sm:bottom-6">
-        <div className="tour-bar">
-          {!isExterior && (
+      {/* ------------------------------ Zoom (+ / -) ----------------------------- */}
+      {isPano && (
+        <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center px-3 sm:bottom-6">
+          <div className="tour-bar">
             <button
               type="button"
-              onClick={() => onGo("exterior")}
+              onClick={() => zoomApi.current?.zoomOut()}
               className="tour-bar__btn"
-              aria-label="Volver al exterior"
+              aria-label="Alejar"
             >
-              <Icon name="back" />
-              <span className="hidden sm:inline">Exterior</span>
+              −
             </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => onGo(prev.id)}
-            className="tour-bar__btn"
-            aria-label={`Escena anterior: ${prev.title}`}
-          >
-            <Icon name="prev" />
-          </button>
-
-          <div className="tour-bar__dots" role="group" aria-label="Escenas">
-            {tourScenes.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onGo(item.id)}
-                data-active={item.id === scene.id}
-                aria-label={item.title}
-                aria-current={item.id === scene.id}
-                title={item.title}
-              />
-            ))}
+            <button
+              type="button"
+              onClick={() => zoomApi.current?.zoomIn()}
+              className="tour-bar__btn"
+              aria-label="Acercar"
+            >
+              +
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={() => onGo(next.id)}
-            className="tour-bar__btn"
-            aria-label={`Escena siguiente: ${next.title}`}
-          >
-            <Icon name="next" />
-          </button>
-
-          {isPano && (
-            <>
-              <button
-                type="button"
-                onClick={() => zoomApi.current?.zoomOut()}
-                className="tour-bar__btn"
-                aria-label="Alejar"
-              >
-                −
-              </button>
-              <button
-                type="button"
-                onClick={() => zoomApi.current?.zoomIn()}
-                className="tour-bar__btn"
-                aria-label="Acercar"
-              >
-                +
-              </button>
-            </>
-          )}
         </div>
-      </div>
+      )}
 
       {/* ------------------------------- Menu lateral ---------------------------- */}
       <AnimatePresence>
